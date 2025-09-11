@@ -110,9 +110,11 @@ export const Header = ({}: HeaderProps) => {
                   {getRoleIcon(user.role)}
                   {getRoleName(user.role)}
                 </Badge>
-                <Button variant="ghost" size="sm">
-                  Profile
-                </Button>
+                <Link to="/profile">
+                  <Button variant="ghost" size="sm">
+                    Profile
+                  </Button>
+                </Link>
                 <Button variant="ghost" size="sm" onClick={handleLogout} title="Logout">
                   <LogOut className="h-4 w-4" />
                   <span className="ml-1 hidden sm:inline">Logout</span>
@@ -170,7 +172,14 @@ export const Header = ({}: HeaderProps) => {
             </Link>
              {user && (
                <>
-                 <Link
+                  <Link
+                    to="/profile"
+                    className="block px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground rounded-md"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Profile
+                  </Link>
+                  <Link
                    to={`/${user.role}`}
                    className="block px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground rounded-md"
                    onClick={() => setMobileMenuOpen(false)}
