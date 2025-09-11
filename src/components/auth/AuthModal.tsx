@@ -180,7 +180,7 @@ export const AuthModal = ({
             </DialogTitle>
           </DialogHeader>
 
-          <div className="flex-1 overflow-y-auto pr-2">
+          <div className="flex-1 overflow-y-auto pr-2 max-h-[calc(90vh-100px)]">
             <Tabs defaultValue={defaultTab} className="w-full">
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="login">Login</TabsTrigger>

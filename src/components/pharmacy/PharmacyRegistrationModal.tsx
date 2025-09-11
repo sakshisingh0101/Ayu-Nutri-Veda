@@ -211,15 +211,16 @@ export const PharmacyRegistrationModal = ({ open, onOpenChange }: PharmacyRegist
             <TabsTrigger value="review">Review</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="basic-info" className="flex-1 space-y-4 overflow-y-auto">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg flex items-center gap-2">
-                  <Building2 className="h-5 w-5" />
-                  Pharmacy Information
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
+          <TabsContent value="basic-info" className="flex-1 overflow-y-auto">
+            <div className="space-y-4 max-h-[calc(100vh-200px)] overflow-y-auto pr-2">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg flex items-center gap-2">
+                    <Building2 className="h-5 w-5" />
+                    Pharmacy Information
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="pharmacy-name">Pharmacy Name *</Label>
@@ -313,7 +314,8 @@ export const PharmacyRegistrationModal = ({ open, onOpenChange }: PharmacyRegist
                   />
                 </div>
               </CardContent>
-            </Card>
+              </Card>
+            </div>
           </TabsContent>
 
           <TabsContent value="verification" className="flex-1 overflow-y-auto">

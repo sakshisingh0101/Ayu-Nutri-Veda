@@ -27,6 +27,8 @@ import heroImage from "@/assets/hero-ayurveda.jpg"
 
 export const Landing = () => {
   const [pharmacyRegOpen, setPharmacyRegOpen] = useState(false)
+  const [authModalOpen, setAuthModalOpen] = useState(false)
+  const [authDefaultTab, setAuthDefaultTab] = useState<'login' | 'register'>('register')
 
   const features = [
     {
@@ -128,7 +130,10 @@ export const Landing = () => {
                 <Button 
                   variant="hero" 
                   size="xl" 
-                  onClick={() => {}} // Header will handle auth modal
+                  onClick={() => {
+                    setAuthDefaultTab('register')
+                    setAuthModalOpen(true)
+                  }}
                   className="flex-1 sm:flex-none"
                 >
                   <Heart className="h-5 w-5 mr-2" />
@@ -202,7 +207,8 @@ export const Landing = () => {
                       } else if (card.role === 'pharmacy') {
                         setPharmacyRegOpen(true)
                       } else {
-                        // Header will handle auth modal
+                        setAuthDefaultTab('register')
+                        setAuthModalOpen(true)
                       }
                     }}
                   >
@@ -261,7 +267,10 @@ export const Landing = () => {
               <Button 
                 variant="hero" 
                 size="xl"
-                onClick={() => {}} // Header will handle auth modal
+                onClick={() => {
+                  setAuthDefaultTab('register')
+                  setAuthModalOpen(true)
+                }}
               >
                 <Users className="h-5 w-5 mr-2" />
                 Join Our Community
@@ -282,6 +291,13 @@ export const Landing = () => {
       <PharmacyRegistrationModal
         open={pharmacyRegOpen}
         onOpenChange={setPharmacyRegOpen}
+      />
+      
+      {/* Auth Modal */}
+      <AuthModal
+        open={authModalOpen}
+        onOpenChange={setAuthModalOpen}
+        defaultTab={authDefaultTab}
       />
     </div>
   )
