@@ -278,9 +278,14 @@ useEffect(() => {
                         <p className="text-sm text-muted-foreground">Avg Energy</p>
                       </div>
                     </div>
-                    <div className="h-64 bg-muted/30 rounded-lg flex items-center justify-center">
-                      <p className="text-muted-foreground">Progress Chart Placeholder</p>
-                    </div>
+                    <div className="h-64 bg-muted/30 rounded-lg flex items-center justify-center overflow-hidden">
+  <img
+    src="/public/progress.png"
+    alt="Progress Chart"
+    className="h-full w-full object-contain"
+  />
+</div>
+
                   </TabsContent>
                   <TabsContent value="weight">
                     <div className="space-y-4">
