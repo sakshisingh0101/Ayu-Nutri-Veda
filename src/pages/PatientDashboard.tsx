@@ -278,13 +278,13 @@ useEffect(() => {
                         <p className="text-sm text-muted-foreground">Avg Energy</p>
                       </div>
                     </div>
-                    <div className="h-64 bg-muted/30 rounded-lg flex items-center justify-center overflow-hidden">
+                    {/* <div className="h-64 bg-muted/30 rounded-lg flex items-center justify-center overflow-hidden">
   <img
     src="/public/progress.png"
     alt="Progress Chart"
     className="h-full w-full object-contain"
   />
-</div>
+</div> */}
 
                   </TabsContent>
                   <TabsContent value="weight">
