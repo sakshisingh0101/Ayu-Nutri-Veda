@@ -7,6 +7,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Header } from "@/components/layout/Header"
 import { MessagingModal } from "@/components/messaging/MessagingModal"
 import { SchedulingModal } from "@/components/scheduling/SchedulingModal"
+import { useAuth } from "@/contexts/AuthContext"
+import { supabase } from "@/integrations/supabase/client"
+import { ScrollArea } from "@/components/ui/scroll-area"
+
+
 import {
   Calendar,
   User,
@@ -37,12 +42,21 @@ export const PatientDashboard = () => {
   const { consultations, loading: consultationsLoading } = useConsultations()
 
   // Get current patient data (for demo, use first patient)
-  useEffect(() => {
-    const patients = users.filter(u => u.User_type === 'patient')
-    if (patients.length > 0) {
-      setCurrentPatient(patients[0])
-    }
-  }, [users])
+  const { user } = useAuth()
+useEffect(() => {
+  const fetchPatient = async () => {
+    if (!user) return
+    const { data, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('Email', user.email)
+      .single()
+    if (error) console.error(error)
+    else setCurrentPatient(data)
+  }
+  fetchPatient()
+}, [user])
+
 
   // Mock progress data (this would come from another table in real app)
   const progressData = {
@@ -138,6 +152,7 @@ export const PatientDashboard = () => {
             doctorName={currentDoctor?.FullName || "Doctor"}
             currentUserEmail={currentPatient?.Email || "patient@example.com"} 
           />
+          
 
         {/* Quick Stats */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">

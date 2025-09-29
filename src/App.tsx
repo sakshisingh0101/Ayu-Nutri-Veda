@@ -13,6 +13,7 @@ import RecipeBuilder from "./pages/RecipeBuilder";
 import ProfilePage from "./pages/ProfilePage";
 import NotFound from "./pages/NotFound";
 
+
 const queryClient = new QueryClient();
 
 const App = () => (

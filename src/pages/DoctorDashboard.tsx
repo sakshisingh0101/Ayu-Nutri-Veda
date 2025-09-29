@@ -10,6 +10,14 @@ import { FullCalendarModal } from "@/components/doctor/FullCalendarModal"
 import { DietChartModal } from "@/components/doctor/DietChartModal"
 import { TreatmentPlansModal } from "@/components/doctor/TreatmentPlansModal"
 import { PatientMessagesModal } from "@/components/doctor/PatientMessagesModal"
+import { useNavigate } from "react-router-dom"
+import { AuthModal } from "@/components/auth/AuthModal"
+import { supabase } from '@/integrations/supabase/client'
+import { useAuth } from '@/contexts/AuthContext'
+
+
+
+
 import {
   Users,
   Calendar,
@@ -41,6 +49,10 @@ export const DoctorDashboard = () => {
   const [dietChartOpen, setDietChartOpen] = useState(false)
   const [treatmentPlansOpen, setTreatmentPlansOpen] = useState(false)
   const [patientMessagesOpen, setPatientMessagesOpen] = useState(false)
+  const navigate = useNavigate()
+ const [authModalOpen, setAuthModalOpen] = useState(false)
+const [authDefaultTab, setAuthDefaultTab] = useState<'login' | 'register'>('register')
+
 
   // Real data from Supabase
   const { users, loading: usersLoading } = useUsers()
@@ -48,15 +60,40 @@ export const DoctorDashboard = () => {
   const { toast } = useToast()
 
   // Get current doctor data (for demo, use first doctor)
-  useEffect(() => {
-    const doctors = users.filter(u => u.User_type === 'doctor')
-    if (doctors.length > 0) {
-      setCurrentDoctor(doctors[0])
+
+
+const { user } = useAuth()
+
+useEffect(() => {
+  const fetchDoctor = async () => {
+    if (!user) return
+    try {
+      const { data: doctorData, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('Email', user.email)
+        .single()
+      if (error) throw error
+      setCurrentDoctor(doctorData)
+    } catch (err) {
+      console.error('Error fetching doctor info:', err)
     }
-  }, [users])
+  }
+
+  fetchDoctor()
+}, [user])
+
 
   // Get patients
   const patients = users.filter(u => u.User_type === 'patient')
+
+  // Active patients = those who have any consultation (requested or completed)
+const activePatientEmails = consultations
+  .filter(c => c.status === 'requested' || c.status === 'completed')
+  .map(c => c.patient_id);
+
+const activePatients = patients.filter(p => activePatientEmails.includes(p.Email));
+
   
   // Get today's consultations (mock schedule based on real data)
   const todaysSchedule = consultations.slice(0, 4).map((consultation, index) => {
@@ -153,10 +190,21 @@ export const DoctorDashboard = () => {
               </p>
             </div>
             <div className="flex gap-2">
-              <Button variant="outline" onClick={() => alert('Add Patient feature coming soon!')}>
+              {/* <Button variant="outline" onClick={() => alert('Add Patient feature coming soon!')}>
                 <UserPlus className="h-4 w-4 mr-2" />
                 Add New Patient
-              </Button>
+              </Button> */}
+              <Button
+  variant="outline"
+  onClick={() => {
+    setAuthDefaultTab('register')
+    setAuthModalOpen(true)
+  }}
+>
+  <UserPlus className="h-4 w-4 mr-2" />
+  Add New Patient
+</Button>
+
               <Button variant="hero" onClick={() => setDietChartOpen(true)}>
                 <Plus className="h-4 w-4 mr-2" />
                 Create Diet Plan
@@ -344,18 +392,85 @@ export const DoctorDashboard = () => {
                       View All Patients
                     </Button>
                   </TabsContent>
-                  <TabsContent value="active">
+                  {/* <TabsContent value="active">
                     <div className="text-center py-8 text-muted-foreground">
                       <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
                       <p>Active patients view</p>
                     </div>
-                  </TabsContent>
-                  <TabsContent value="all">
+                  </TabsContent> */}
+                  <TabsContent value="active" className="space-y-4">
+  {activePatients.length === 0 ? (
+    <p className="text-center text-muted-foreground">No active patients found</p>
+  ) : (
+    activePatients.map((patient, index) => (
+      <div
+        key={index}
+        className="flex items-center justify-between p-3 rounded-lg border hover:bg-muted/50 cursor-pointer"
+      >
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+            <Stethoscope className="h-4 w-4 text-primary" />
+          </div>
+          <div>
+            <p className="font-medium">{patient.FullName}</p>
+            <p className="text-sm text-muted-foreground">
+              Age: {Math.floor(Math.random() * 40) + 20} • {patient.Email}
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button size="sm" variant="ghost" onClick={() => {
+            setSelectedPatientName(patient.FullName)
+            setMessagingOpen(true)
+          }}>
+            <MessageCircle className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
+    ))
+  )}
+</TabsContent>
+
+                  {/* <TabsContent value="all">
                     <div className="text-center py-8 text-muted-foreground">
                       <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
                       <p>All patients view</p>
                     </div>
-                  </TabsContent>
+                  </TabsContent> */}
+                  <TabsContent value="all" className="space-y-4">
+  {patients.length === 0 ? (
+    <p className="text-center text-muted-foreground">No patients found</p>
+  ) : (
+    patients.map((patient, index) => (
+      <div
+        key={index}
+        className="flex items-center justify-between p-3 rounded-lg border hover:bg-muted/50 cursor-pointer"
+      >
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+            <Stethoscope className="h-4 w-4 text-primary" />
+          </div>
+          <div>
+            <p className="font-medium">{patient.FullName}</p>
+            <p className="text-sm text-muted-foreground">
+              Age: {Math.floor(Math.random() * 40) + 20} • {patient.Email}
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <Button size="sm" variant="ghost" onClick={() => {
+            setSelectedPatientName(patient.FullName)
+            setMessagingOpen(true)
+          }}>
+            <MessageCircle className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
+    ))
+  )}
+</TabsContent>
+
+
                 </Tabs>
               </CardContent>
             </Card>
@@ -403,10 +518,15 @@ export const DoctorDashboard = () => {
                   <Plus className="h-4 w-4 mr-2" />
                   Create Diet Chart
                 </Button>
-                <Button variant="outline" className="w-full justify-start" onClick={() => window.location.href = '/recipes'}>
+                {/* <Button variant="outline" className="w-full justify-start" onClick={() => window.location.href = '/recipes'}>
                   <BookOpen className="h-4 w-4 mr-2" />
                   Recipe Builder
-                </Button>
+                </Button> */}
+                <Button variant="outline" className="w-full justify-start" onClick={() => navigate('/recipes')}>
+  <BookOpen className="h-4 w-4 mr-2" />
+  Recipe Builder
+</Button>
+
                 <Button variant="outline" className="w-full justify-start" onClick={() => setTreatmentPlansOpen(true)}>
                   <FileText className="h-4 w-4 mr-2" />
                   Treatment Plans
@@ -489,6 +609,11 @@ export const DoctorDashboard = () => {
         onOpenChange={setPatientMessagesOpen}
         currentDoctorId={currentDoctor?.Email}
       />
+      <AuthModal
+  open={authModalOpen}
+  onOpenChange={setAuthModalOpen}
+  defaultTab={authDefaultTab}
+/>
     </div>
   )
 }
